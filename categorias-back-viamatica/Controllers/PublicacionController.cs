@@ -22,19 +22,25 @@ namespace categorias_back_viamatica.Controllers
         [HttpGet]
         public IActionResult GetPublicaciones()
         {
+            // Obtén el ID del usuario autenticado desde el token JWT
+            var usuarioId = int.Parse(User.FindFirst("UsuarioId")?.Value);
+
+            // Filtra las publicaciones por el ID del usuario autenticado
             var publicaciones = _context.Publicaciones
                 .Include(p => p.Usuario)
+                .Where(p => p.UsuarioId == usuarioId) // Filtra las publicaciones del usuario autenticado
                 .Select(p => new
                 {
                     p.Id,
                     p.Titulo,
                     p.Contenido,
-                    Usuario = p.Usuario.Correo // Puedes personalizar lo que devuelves aquí
+                    Usuario = p.Usuario.Correo // Devuelve el correo del usuario asociado
                 })
                 .ToList();
 
             return Ok(publicaciones);
         }
+
 
         // Crear una nueva publicación
         [HttpPost]
