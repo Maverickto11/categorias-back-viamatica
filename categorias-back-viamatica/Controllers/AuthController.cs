@@ -1,5 +1,6 @@
 ﻿using categorias_back_viamatica.Data;
 using categorias_back_viamatica.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,9 +9,9 @@ using System.Text;
 
 namespace categorias_back_viamatica.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : Controller
+    [Route("api/[controller]")]
+    public class AuthController : ControllerBase
     {
        
         

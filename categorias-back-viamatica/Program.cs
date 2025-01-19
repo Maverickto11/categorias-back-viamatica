@@ -69,8 +69,8 @@ app.UseCors("AllowAll");
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 
 // Swagger middleware

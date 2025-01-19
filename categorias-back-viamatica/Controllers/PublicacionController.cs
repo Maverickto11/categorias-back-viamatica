@@ -8,7 +8,7 @@ namespace categorias_back_viamatica.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize] // Requiere autenticación para acceder a los endpoints
+    [Authorize]
     public class PublicacionController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
