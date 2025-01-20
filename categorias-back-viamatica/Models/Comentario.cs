@@ -4,10 +4,12 @@
     {
         public int Id { get; set; }
         public string Contenido { get; set; }
-        public int UsuarioId { get; set; }  // Relación con el usuario que hizo el comentario
-        public Usuario Usuario { get; set; }  // Relación con el usuario (opcional para la consulta)
-        public int PublicacionId { get; set; }  // Relación con la publicación a la que pertenece el comentario
-        public Publicacion Publicacion { get; set; }
+        public int? UsuarioId { get; set; } 
+        public Usuario? Usuario { get; set; }  
+        public int? PublicacionId { get; set; }  
+        public Publicacion? Publicacion { get; set; }
+        public DateTime FechaCreacion { get; set; }
+
     }
 
 }

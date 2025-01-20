@@ -9,6 +9,8 @@ namespace categorias_back_viamatica.Data
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
 
+        public DbSet<Comentario> Comentarios { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
