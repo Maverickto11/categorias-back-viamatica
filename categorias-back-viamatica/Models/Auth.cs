@@ -2,8 +2,8 @@
 {
     public class Auth
     {
-        public string Correo { get; set; } // Correo electrónico para el login
-        public string Contrasena { get; set; } // Contraseña para el login
+        public string Correo { get; set; } 
+        public string Contrasena { get; set; }
     }
 
 }

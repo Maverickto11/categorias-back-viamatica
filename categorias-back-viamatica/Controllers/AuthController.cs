@@ -29,25 +29,22 @@ namespace categorias_back_viamatica.Controllers
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginModel model)
         {
-            var usuario = _context.Usuarios
-                                  .SingleOrDefault(u => u.Correo == model.Correo);
+            var usuario = _context.Usuarios.SingleOrDefault(u => u.Correo == model.Correo);
 
             if (usuario == null)
             {
-                return Unauthorized();  // Retorna un error si el correo no existe
+                return Unauthorized(new { message = "Credenciales incorrectas." });
             }
 
-            // Verifica si la contraseña en texto plano coincide con el hash almacenado
+            // Verificar si la contraseña ingresada coincide con la contraseña cifrada
             if (!BCrypt.Net.BCrypt.Verify(model.Contrasena, usuario.Contrasena))
             {
-                return Unauthorized();  // Retorna un error si las credenciales son incorrectas
+                return Unauthorized(new { message = "Credenciales incorrectas." });
             }
 
-            // Generar el token si la contraseña es válida
             var token = GenerarToken(usuario);
-            return Ok(new { Token = token });
+            return Ok(new LoginResponse { Token = token });
         }
-
 
 
         [HttpPost("registro")]
@@ -60,16 +57,13 @@ namespace categorias_back_viamatica.Controllers
                 return BadRequest("Todos los campos son obligatorios.");
             }
 
-            // Verificar si el correo ya está registrado
             if (_context.Usuarios.Any(u => u.Correo == model.Correo))
             {
                 return Conflict("El correo ya está registrado.");
             }
 
-            // Encriptar la contraseña (usa un método de encriptación seguro, como BCrypt)
             model.Contrasena = BCrypt.Net.BCrypt.HashPassword(model.Contrasena);
 
-            // Guardar el usuario en la base de datos
             _context.Usuarios.Add(model);
             _context.SaveChanges();
 
@@ -95,11 +89,11 @@ namespace categorias_back_viamatica.Controllers
                     _configuration["Jwt:Issuer"],
                     _configuration["Jwt:Audience"],
                     claims,
-                    expires: DateTime.Now.AddHours(1),  // Expiración del token
+                    expires: DateTime.Now.AddHours(1),  
                     signingCredentials: creds
                 );
 
-                return new JwtSecurityTokenHandler().WriteToken(token);  // Genera y retorna el token
+                return new JwtSecurityTokenHandler().WriteToken(token);  
             }
         }
         public class LoginModel
