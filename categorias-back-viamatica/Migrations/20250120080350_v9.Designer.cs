@@ -12,8 +12,8 @@ using categorias_back_viamatica.Data;
 namespace categorias_back_viamatica.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250119235948_v4")]
-    partial class v4
+    [Migration("20250120080350_v9")]
+    partial class v9
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,77 @@ namespace categorias_back_viamatica.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("categorias_back_viamatica.Models.Categoria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ImagenUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Categorias");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ImagenUrl = "url_de_imagen_deportes",
+                            Nombre = "Deportes"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ImagenUrl = "url_de_imagen_artes",
+                            Nombre = "Artes"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ImagenUrl = "url_de_imagen_tecnologia",
+                            Nombre = "Tecnología"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ImagenUrl = "url_de_imagen_videojuegos",
+                            Nombre = "Videojuegos"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ImagenUrl = "url_de_imagen_ciencia",
+                            Nombre = "Ciencia"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ImagenUrl = "url_de_imagen_musica",
+                            Nombre = "Música"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ImagenUrl = "url_de_imagen_cine",
+                            Nombre = "Cine"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ImagenUrl = "url_de_imagen_viajes",
+                            Nombre = "Viajes"
+                        });
+                });
 
             modelBuilder.Entity("categorias_back_viamatica.Models.Comentario", b =>
                 {
@@ -40,10 +111,10 @@ namespace categorias_back_viamatica.Migrations
                     b.Property<DateTime>("FechaCreacion")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("PublicacionId")
+                    b.Property<int?>("PublicacionId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UsuarioId")
+                    b.Property<int?>("UsuarioId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -63,6 +134,9 @@ namespace categorias_back_viamatica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CategoriaId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Contenido")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -75,6 +149,8 @@ namespace categorias_back_viamatica.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoriaId");
 
                     b.HasIndex("UsuarioId");
 
@@ -89,11 +165,15 @@ namespace categorias_back_viamatica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Contraseña")
+                    b.Property<string>("Contrasena")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Correo")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Nombre")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -106,15 +186,11 @@ namespace categorias_back_viamatica.Migrations
                 {
                     b.HasOne("categorias_back_viamatica.Models.Publicacion", "Publicacion")
                         .WithMany()
-                        .HasForeignKey("PublicacionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PublicacionId");
 
                     b.HasOne("categorias_back_viamatica.Models.Usuario", "Usuario")
                         .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UsuarioId");
 
                     b.Navigation("Publicacion");
 
@@ -123,11 +199,22 @@ namespace categorias_back_viamatica.Migrations
 
             modelBuilder.Entity("categorias_back_viamatica.Models.Publicacion", b =>
                 {
+                    b.HasOne("categorias_back_viamatica.Models.Categoria", "Categoria")
+                        .WithMany("Publicaciones")
+                        .HasForeignKey("CategoriaId");
+
                     b.HasOne("categorias_back_viamatica.Models.Usuario", "Usuario")
                         .WithMany()
                         .HasForeignKey("UsuarioId");
 
+                    b.Navigation("Categoria");
+
                     b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("categorias_back_viamatica.Models.Categoria", b =>
+                {
+                    b.Navigation("Publicaciones");
                 });
 #pragma warning restore 612, 618
         }

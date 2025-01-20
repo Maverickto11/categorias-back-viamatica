@@ -162,7 +162,7 @@ namespace categorias_back_viamatica.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Contraseña")
+                    b.Property<string>("Contrasena")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

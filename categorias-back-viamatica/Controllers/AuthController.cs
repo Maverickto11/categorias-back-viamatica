@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using BCrypt.Net;
 
 namespace categorias_back_viamatica.Controllers
 {
@@ -24,27 +25,37 @@ namespace categorias_back_viamatica.Controllers
                 _configuration = configuration;
             }
 
-            // Endpoint para login
-            [HttpPost("login")]
-            public IActionResult Login([FromBody] LoginModel model)
+        // Endpoint para login
+        [HttpPost("login")]
+        public IActionResult Login([FromBody] LoginModel model)
+        {
+            var usuario = _context.Usuarios
+                                  .SingleOrDefault(u => u.Correo == model.Correo);
+
+            if (usuario == null)
             {
-                var usuario = _context.Usuarios
-                                      .SingleOrDefault(u => u.Correo == model.Correo && u.Contraseña == model.Contraseña);
-
-                if (usuario == null)
-                {
-                    return Unauthorized();  // Retorna un error si las credenciales son incorrectas
-                }
-
-                var token = GenerarToken(usuario);
-                return Ok(new { Token = token });
+                return Unauthorized();  // Retorna un error si el correo no existe
             }
+
+            // Verifica si la contraseña en texto plano coincide con el hash almacenado
+            if (!BCrypt.Net.BCrypt.Verify(model.Contrasena, usuario.Contrasena))
+            {
+                return Unauthorized();  // Retorna un error si las credenciales son incorrectas
+            }
+
+            // Generar el token si la contraseña es válida
+            var token = GenerarToken(usuario);
+            return Ok(new { Token = token });
+        }
+
+
+
         [HttpPost("registro")]
         public IActionResult RegistrarUsuario([FromBody] Usuario model)
         {
             if (string.IsNullOrWhiteSpace(model.Nombre) ||
                 string.IsNullOrWhiteSpace(model.Correo) ||
-                string.IsNullOrWhiteSpace(model.Contraseña))
+                string.IsNullOrWhiteSpace(model.Contrasena))
             {
                 return BadRequest("Todos los campos son obligatorios.");
             }
@@ -56,7 +67,7 @@ namespace categorias_back_viamatica.Controllers
             }
 
             // Encriptar la contraseña (usa un método de encriptación seguro, como BCrypt)
-            model.Contraseña = BCrypt.Net.BCrypt.HashPassword(model.Contraseña);
+            model.Contrasena = BCrypt.Net.BCrypt.HashPassword(model.Contrasena);
 
             // Guardar el usuario en la base de datos
             _context.Usuarios.Add(model);
@@ -94,7 +105,7 @@ namespace categorias_back_viamatica.Controllers
         public class LoginModel
         {
             public string Correo { get; set; }
-            public string Contraseña { get; set; }
+            public string Contrasena { get; set; }
         }
 
     
