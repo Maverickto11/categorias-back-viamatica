@@ -76,6 +76,46 @@ namespace categorias_back_viamatica.Controllers
             return CreatedAtAction(nameof(GetComentariosByPublicacion), new { publicacionId = publicacionId }, comentario);
         }
 
+        [HttpPut("{comentarioId}")]
+        public IActionResult EditComentario(int comentarioId, [FromBody] JsonElement requestBody)
+        {
+            // Extrae el contenido del comentario del JSON
+            if (!requestBody.TryGetProperty("Contenido", out JsonElement contenidoElement) || string.IsNullOrWhiteSpace(contenidoElement.GetString()))
+            {
+                return BadRequest("El contenido del comentario es obligatorio.");
+            }
+
+            string nuevoContenido = contenidoElement.GetString();
+
+            // Obtén el ID del usuario autenticado desde el token JWT
+            var usuarioId = int.Parse(User.FindFirst("UsuarioId")?.Value);
+
+            // Busca el comentario en la base de datos
+            var comentario = _context.Comentarios.Find(comentarioId);
+            if (comentario == null)
+            {
+                return NotFound($"No se encontró ningún comentario con el ID {comentarioId}.");
+            }
+
+            // Verifica que el comentario pertenece al usuario autenticado
+            if (comentario.UsuarioId != usuarioId)
+            {
+                return Forbid("No tienes permiso para editar este comentario.");
+            }
+
+            // Actualiza el contenido del comentario
+            comentario.Contenido = nuevoContenido;
+            comentario.FechaCreacion = DateTime.UtcNow; // Actualiza la fecha de modificación
+
+            _context.Comentarios.Update(comentario);
+            _context.SaveChanges();
+
+            return Ok(comentario);
+        }
+
+
+
+
 
         // Eliminar un comentario (solo el propietario puede eliminarlo)
         [HttpDelete("{id}")]
