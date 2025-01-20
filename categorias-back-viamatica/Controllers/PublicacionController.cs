@@ -46,17 +46,35 @@ namespace categorias_back_viamatica.Controllers
         [HttpPost]
         public IActionResult CreatePublicacion([FromBody] Publicacion model)
         {
-            // Obtén el ID del usuario autenticado desde el token JWT
             var usuarioId = int.Parse(User.FindFirst("UsuarioId")?.Value);
 
-            // Asigna el ID del usuario autenticado a la publicación
+            // Si no se pasa el CategoriaId, se devuelve un error
+            if (model.CategoriaId == 0)
+            {
+                return BadRequest("El ID de la categoría es necesario.");
+            }
+
+            // Obtener la categoría desde la base de datos usando el CategoriaId
+            var categoria = _context.Categorias.Find(model.CategoriaId);
+            if (categoria == null)
+            {
+                return BadRequest("La categoría especificada no existe.");
+            }
+
+            // Asignar el UsuarioId automáticamente
             model.UsuarioId = usuarioId;
 
+            // Asignar la categoría a la publicación
+            model.CategoriaId = categoria.Id;
+
+            // Guardar la publicación
             _context.Publicaciones.Add(model);
             _context.SaveChanges();
 
             return CreatedAtAction(nameof(GetPublicaciones), new { id = model.Id }, model);
         }
+
+
 
         // Editar una publicación (solo el propietario puede editarla)
         [HttpPut("{id}")]

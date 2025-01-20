@@ -39,9 +39,38 @@ namespace categorias_back_viamatica.Controllers
                 var token = GenerarToken(usuario);
                 return Ok(new { Token = token });
             }
+        [HttpPost("registro")]
+        public IActionResult RegistrarUsuario([FromBody] Usuario model)
+        {
+            if (string.IsNullOrWhiteSpace(model.Nombre) ||
+                string.IsNullOrWhiteSpace(model.Correo) ||
+                string.IsNullOrWhiteSpace(model.Contraseña))
+            {
+                return BadRequest("Todos los campos son obligatorios.");
+            }
 
-            // Método para generar el JWT
-            private string GenerarToken(Usuario usuario)
+            // Verificar si el correo ya está registrado
+            if (_context.Usuarios.Any(u => u.Correo == model.Correo))
+            {
+                return Conflict("El correo ya está registrado.");
+            }
+
+            // Encriptar la contraseña (usa un método de encriptación seguro, como BCrypt)
+            model.Contraseña = BCrypt.Net.BCrypt.HashPassword(model.Contraseña);
+
+            // Guardar el usuario en la base de datos
+            _context.Usuarios.Add(model);
+            _context.SaveChanges();
+
+            return Ok(new { message = "Usuario registrado exitosamente." });
+        }
+
+
+
+
+
+        // Método para generar el JWT
+        private string GenerarToken(Usuario usuario)
             {
                 var claims = new[]
                 {
