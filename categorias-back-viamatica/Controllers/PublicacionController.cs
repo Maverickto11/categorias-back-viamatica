@@ -117,8 +117,9 @@ namespace categorias_back_viamatica.Controllers
 
             _context.SaveChanges();
 
-            return Ok(new { mensaje = "Publicación actualizada correctamente" });
+            return Ok(new { mensaje = "Publicación actualizada correctamente", publicacion });
         }
+
 
         [HttpDelete("{id}")]
         public IActionResult DeletePublicacion(int id)
